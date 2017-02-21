@@ -130,7 +130,7 @@ for($i = 0; $i < count ( $ship ); $i ++) {
 }
 
 $success = array (
-		"response " => true,
+		"response" => true,
 		"pid" => uniqid ( round ( microtime ( true ) * 1000 ) ) 
 );
 exit ( json_encode ( $success ) );
