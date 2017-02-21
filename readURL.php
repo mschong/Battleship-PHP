@@ -8,8 +8,4 @@ $coordinates = explode(",", $input[2]);
 $x = $coordinates[0];
 $y = $coordinates[1];
 
-echo $pid . "\n";
-echo $x . "\n";
-echo $y . "\n";
-
 ?>
