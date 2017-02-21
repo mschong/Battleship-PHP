@@ -1,29 +1,22 @@
 <?php
-$url = " new?strategy=Smart&ships=Aircraft+carrier,1,6,true;Battleship,7,5,true;Frigate,2,1,false;Submarine,9,6,false;Minesweeper,10,9,false";
-// $url = " new?strategy=Smart&";
-
-$input = explode ( "?", $url );
-
-$strategy = explode ( "&", $input [1] );
+$strategy = $_GET ['strategy'];
+$ships = $_GET ['ships'];
 
 $board = createBoard ( 10 );
 
-//Check if ship info is provided
-if ($strategy [1] == null) {
+// Check if ship info is provided
+if ($ships == null) {
 	$s = createRandShips ();
-	
 	$board = randomPlacement ( 10, $s );
-	
-	for($i = 1; $i <= 10; $i ++) {
-		for($j = 1; $j <= 10; $j ++)
-			echo $board [$i] [$j];
-		echo "\n";
-	}
-	exit ();
+	$success = array (
+			"response " => true,
+			"pid" => uniqid ( round ( microtime ( true ) * 1000 ) ) 
+	);
+	exit ( json_encode ( $success ) );
 }
 
 // Strategy not specified
-if ($strategy [0] == null) {
+if ($strategy == null) {
 	$strategyNotSpecified = array (
 			"response" => false,
 			"reason" => "Strategy not specified" 
@@ -31,10 +24,8 @@ if ($strategy [0] == null) {
 	exit ( json_encode ( $strategyNotSpecified ) );
 }
 
-$typeStrategy = explode ( "=", $strategy [0] );
-
 // Unknown strategy
-if ($typeStrategy [1] != "Smart" && $typeStrategy [1] != "Sweep" && $typeStrategy [1] != "Random") {
+if ($strategy != "Smart" && $strategy != "Sweep" && $strategy != "Random") {
 	$unknownStrategy = array (
 			"response" => false,
 			"reason" => "Unknown strategy" 
@@ -42,56 +33,63 @@ if ($typeStrategy [1] != "Smart" && $typeStrategy [1] != "Sweep" && $typeStrateg
 	exit ( json_encode ( $unknownStrategy ) );
 }
 
-$ships = explode ( "=", $strategy [1] );
+// $ships = explode ( "=", $strategy [1] );
 
-$ship = explode ( ";", $ships [1] );
-
-list ( $name, $x, $y, $direction ) = explode ( ",", $ship [0] );
+$ship = explode ( ";", $ships );
 $shipSize = array (
-		"Aircraft+carrier" => 5,
+		"Aircraft carrier" => 5,
 		"Battleship" => 4,
 		"Frigate" => 3,
 		"Submarine" => 3,
 		"Minesweeper" => 2 
 );
-
-// Unknown ship name
-if ($name != "Aircraft+carrier" && $name != "Battleship" && $name != "Frigate" && $name != "Submarine" && $name != "Minesweeper") {
-	$uknownName = array (
-			"response" => false,
-			"reason" => "Unknown ship name" 
-	);
-	exit ( json_encode ( $uknownName ) );
-}
-
-// Invalid ship position
-if ($direction == true) {
-	if ($x + $shipSize [$name] > 10 || $x < 1 || $y > 10 || $y < 1) {
-		$invalidPos = array (
+for($i = 0; $i < count ( $ship ); $i ++) {
+	list ( $name, $x, $y, $direction ) = explode ( ",", $ship [$i] );
+	
+	if ($direction == "true")
+		$direction = true;
+	
+	else if ($direction == "false")
+		$direction = false;
+	
+	else{
+		$invalidDir = array (
 				"response" => false,
-				"reason" => "Invalid ship position" 
+				"reason" => "Invalid ship direction"
 		);
-		exit ( json_encode ( $invalidPos ) );
-	}
-} else {
-	if ($x > 10 || $x < 1 || $y + $shipSize [$name] > 10 || $y < 1) {
-		$invalidPos = array (
+		exit ( json_encode ( $invalidDir ) );
+	}	
+	
+	// Unknown ship name
+	if ($name != "Aircraft carrier" && $name != "Battleship" && $name != "Frigate" && $name != "Submarine" && $name != "Minesweeper") {
+		$uknownName = array (
 				"response" => false,
-				"reason" => "Invalid ship position" 
+				"reason" => "Unknown ship name" 
 		);
-		exit ( json_encode ( $invalidPos ) );
+		exit ( json_encode ( $uknownName ) );
+	}
+	
+	// Invalid ship position
+	if ($direction == true) {
+		if ($x + $shipSize [$name] - 1 > 10 || $x < 1 || $y > 10 || $y < 1) {
+			$invalidPos = array (
+					"response" => false,
+					"reason" => "Invalid ship position" 
+			);
+			exit ( json_encode ( $invalidPos ) );
+		}
+	} else {
+		if ($x > 10 || $x < 1 || $y + $shipSize [$name] - 1 > 10 || $y < 1) {
+			$invalidPos = array (
+					"response" => false,
+					"reason" => "Invalid ship position" 
+			);
+			$sum = $y + $shipSize [$name] - 1;
+			
+			exit ( json_encode ( $invalidPos ) );
+		}
 	}
 }
-
-// Invalid ship direction
-if ($direction != "true" && $direction != "false") {
-	$invalidDir = array (
-			"response" => false,
-			"reason" => "Invalid ship direction" 
-	);
-	exit ( json_encode ( $invalidDir ) );
-}
-
 // Place ships in board
 // Error: Conflicting ship deployments
 $shipsArray = array ();
@@ -121,10 +119,10 @@ if (count ( $ship ) != 5) {
 
 for($i = 0; $i < count ( $ship ); $i ++) {
 	for($j = $i + 1; $j < count ( $ship ); $j ++) {
-		if ($shipsArray [$i]->name == $shipsArray [$j]->name){
+		if ($shipsArray [$i]->name == $shipsArray [$j]->name) {
 			$incompleteShips = array (
 					"response" => false,
-					"reason" => "Incomplete ship deployments"
+					"reason" => "Incomplete ship deployments" 
 			);
 			exit ( json_encode ( $incompleteShips ) );
 		}
@@ -185,7 +183,7 @@ function randomPlacement($boardSize, &$ships) {
 function createRandShips() {
 	$shipNames = array (
 			
-			"Aircraft+carrier",
+			"Aircraft carrier",
 			"Battleship",
 			"Frigate",
 			"Submarine",
