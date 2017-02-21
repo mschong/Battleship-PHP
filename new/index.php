@@ -9,7 +9,7 @@ if ($ships == null) {
 	$s = createRandShips ();
 	$board = randomPlacement ( 10, $s );
 	$success = array (
-			"response " => true,
+			"response" => true,
 			"pid" => uniqid ( round ( microtime ( true ) * 1000 ) ) 
 	);
 	exit ( json_encode ( $success ) );
@@ -52,13 +52,13 @@ for($i = 0; $i < count ( $ship ); $i ++) {
 	else if ($direction == "false")
 		$direction = false;
 	
-	else{
+	else {
 		$invalidDir = array (
 				"response" => false,
-				"reason" => "Invalid ship direction"
+				"reason" => "Invalid ship direction" 
 		);
 		exit ( json_encode ( $invalidDir ) );
-	}	
+	}
 	
 	// Unknown ship name
 	if ($name != "Aircraft carrier" && $name != "Battleship" && $name != "Frigate" && $name != "Submarine" && $name != "Minesweeper") {
@@ -130,7 +130,7 @@ for($i = 0; $i < count ( $ship ); $i ++) {
 }
 
 $success = array (
-		"response " => true,
+		"response" => true,
 		"pid" => uniqid ( round ( microtime ( true ) * 1000 ) ) 
 );
 exit ( json_encode ( $success ) );
@@ -148,10 +148,10 @@ function placeInBoard(&$board, $ship) {
 	
 	if (! $ship->horizontal) {
 		for($i = 0; $i < $ship->size; $i ++)
-			$board [$ship->y + $i] [$ship->x] = $ship->name;
+			$board [$ship->x] [$ship->y + $i] = $ship->name;
 	} else {
 		for($i = 0; $i < $ship->size; $i ++)
-			$board [$ship->y] [$ship->x + $i] = $ship->name;
+			$board [$ship->x + $i] [$ship->y] = $ship->name;
 	}
 	
 	return true;
