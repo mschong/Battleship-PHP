@@ -16,7 +16,7 @@ if ($pid == null) {
 // Unknown pid
 if (! $gameInfo ) {
 	$unknownPid = array (
-			"responer" => false,
+			"response" => false,
 			"reason" => "Unknown pid" 
 	);
 	exit ( json_encode ( $unknownPid ) );
