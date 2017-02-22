@@ -90,6 +90,9 @@ for($i = 0; $i < count ( $ship ); $i ++) {
 		}
 	}
 }
+
+
+
 // Place ships in board
 // Error: Conflicting ship deployments
 $shipsArray = array ();
@@ -107,12 +110,11 @@ foreach ( $ship as $individualShip ) {
 	}
 	$i ++;
 }
-
 // Incomplete ship deployments
 if (count ( $ship ) != 5) {
 	$incompleteShips = array (
 			"response" => false,
-			"reason" => "Incomplete ship deployments" 
+			"reason" => "Incomplete ship deployments"
 	);
 	exit ( json_encode ( $incompleteShips ) );
 }
@@ -122,17 +124,28 @@ for($i = 0; $i < count ( $ship ); $i ++) {
 		if ($shipsArray [$i]->name == $shipsArray [$j]->name) {
 			$incompleteShips = array (
 					"response" => false,
-					"reason" => "Incomplete ship deployments" 
+					"reason" => "Incomplete ship deployments"
 			);
 			exit ( json_encode ( $incompleteShips ) );
 		}
 	}
 }
 
+$pid = uniqid(round(microtime(true)*1000));
 $success = array (
 		"response" => true,
-		"pid" => uniqid ( round ( microtime ( true ) * 1000 ) ) 
+		"pid" => $pid 
 );
+
+$file = fopen("$pid", "w");
+echo json_encode($file);
+foreach($shipsArray as $s){
+	fwrite($file, "$s->name, $s->x, $s->y, $s->horizontal, $s->size" );
+	fwrite($file, PHP_EOL);
+}
+	
+	
+	
 exit ( json_encode ( $success ) );
 function prettyPrint($board) {
 	for($i = 1; $i <= 10; $i ++) {
