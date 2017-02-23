@@ -1,8 +1,10 @@
 <?php
+include 'Board.php';
 $pid = $_GET ['pid'];
 $shot = $_GET ['shot'];
 $coord = explode ( ",", $shot );
 $gameInfo = fopen("../new/$pid", "r");
+$createBoard(10);
 
 // Pid not specified
 if ($pid == null) {
@@ -21,6 +23,13 @@ if (! $gameInfo ) {
 	);
 	exit ( json_encode ( $unknownPid ) );
 }
+
+while (($line = fgets($gameInfo)) != false){
+      $explodedLine = explode(",", $line);
+      fillBoard($explodedLine[1], $explodedLine[2], $explodedLine[4],$explodedLine[3],$explodedLine[0]);
+}
+
+printBoard();
 
 // Shot not specified
 if ($shot == null) {
