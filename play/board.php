@@ -2,6 +2,15 @@
 
 $board;
 
+function createBoard($size){
+	$board = array(array());
+	for ($i = 0; $i < $size; $i++) {
+		for ($e = 0; $e < $size; $e++) {
+			board[$i][$e] = 0;
+		}
+	}
+}
+
 function fillBoard($x,$y,$size,$direction,$name){
 	
 	$letter = substr($name, 0);
@@ -41,6 +50,7 @@ function printBoard(){
 		for ($j = 0;$j<count($board[0]);$j++){
 			echo $board[$i][$j];
 		}
+		echo "\n";
 	}
 }
 
