@@ -1,10 +1,13 @@
 <?php
-include 'Board.php';
-$pid = $_GET ['pid'];
-$shot = $_GET ['shot'];
+include 'board.php';
+// $pid = $_GET ['pid'];
+// $shot = $_GET ['shot'];
+$pid = "148772130011158acd3541b28f";
+$shot = "4,5";
 $coord = explode ( ",", $shot );
 $gameInfo = fopen("../new/$pid", "r");
-$createBoard(10);
+
+$board = createBoard(10);
 
 // Pid not specified
 if ($pid == null) {
@@ -26,10 +29,15 @@ if (! $gameInfo ) {
 
 while (($line = fgets($gameInfo)) != false){
       $explodedLine = explode(",", $line);
-      fillBoard($explodedLine[1], $explodedLine[2], $explodedLine[4],$explodedLine[3],$explodedLine[0]);
+      if ($explodedLine[3] == '1')
+      	$explodedLine[3] = true;
+      else
+      	$explodedLine[3] = false;
+      
+      $board = fillBoard($board, $explodedLine[1], $explodedLine[2], $explodedLine[4],$explodedLine[3],$explodedLine[0]);
 }
 
-printBoard();
+printBoard($board);
 
 // Shot not specified
 if ($shot == null) {

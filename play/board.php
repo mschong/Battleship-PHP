@@ -1,30 +1,48 @@
 <?php
 
-$board;
-
 function createBoard($size){
 	$board = array(array());
-	for ($i = 0; $i < $size; $i++) {
-		for ($e = 0; $e < $size; $e++) {
-			board[$i][$e] = 0;
+	for ($i = 1; $i <= $size; $i++) {
+		for ($j = 1; $j <= $size; $j++) {
+			$board[$i][$j] = 0;
 		}
 	}
+	return $board;
 }
 
-function fillBoard($x,$y,$size,$direction,$name){
+function fillBoard($boardToFill, $x,$y,$size,$direction,$name){
 	
-	$letter = substr($name, 0);
-	
+	$letter = $name[0];
+	$intx = intval($x);
+	$inty = intval($y);
 	for ($i = 0; $i < $size; $i++) {
 		if ($direction == true){
-			$board[$x][$y+$i] = $letter;
+			$boardToFill[$intx+$i][$inty] = $letter;
+// 			echo $boardToFill[$intx+$i][$inty];
+// 			echo"\n";
+// 			printBoard($boardToFill);
 		}
 		else{
-			$board[$x+$i][$y] = $letter;
+			$boardToFill[$intx][$inty+$i] = $letter;
+// 			echo $boardToFill[$intx+$i][$inty];
+// 			echo"\n";
+// 			printBoard($boardToFill);
 		}
 	}
+	return $boardToFill;
 }
 
+function printBoard($boardToPrint){
+	echo "printing board\n";
+
+	for ($i = 1;$i<=count($boardToPrint);$i++){
+		for ($j = 1;$j<=count($boardToPrint);$j++){
+			echo $boardToPrint[$i][$j];
+			echo " ";
+		}
+		echo "\n";
+	}
+}
 function visited($x,$y){
 	
 	if ($board[$x][$y]){
@@ -45,13 +63,6 @@ function isThereShip($x,$y){
 	}
 }
 
-function printBoard(){
-	for ($i = 0;$i<count($board);$i++){
-		for ($j = 0;$j<count($board[0]);$j++){
-			echo $board[$i][$j];
-		}
-		echo "\n";
-	}
-}
+
 
 ?>
