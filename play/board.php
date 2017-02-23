@@ -36,4 +36,12 @@ function isThereShip($x,$y){
 	}
 }
 
+function printBoard(){
+	for ($i = 0;$i<count($board);$i++){
+		for ($j = 0;$j<count($board[0]);$j++){
+			echo $board[$i][$j];
+		}
+	}
+}
+
 ?>
