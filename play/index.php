@@ -99,10 +99,12 @@ for($i = 0; $i < 5; $i ++){
 	$AIboard = fillBoard($AIboard, $AIShips[$i]);
 }
 
+$randomX = rand(1,10);
+$randomY = rand(1,10);
 hit($coord[0],$coord[1],$AIboard, "ack_shot");
-hit(rand(1,10),rand(1,10),$board, "shot");
+hit($randomX,$randomY,$board, "shot");
 
-function isWin(){
+function isWin($player){
 	if($countSunk == 5){
 		return true;
 	}
@@ -123,7 +125,12 @@ function hit($x,$y,$boardToHit,$shotType){
 		exit ( json_encode ( $invalidShot ) );
 	} else{
 		$ship = $hitResponse;
-		$hit = array("response" => true, "ack_shot" => array("x" => $x, "y" => $y, "isHit" => isHit($AIboard, $ship, $x, $y), "isSunk" => isSunk($AIboard, $ship, $x, $y), "isWin" => isWin()), "shot" => array("x" => rand(1,10), "y" => rand(1,10), "isHit" => isHit($board, $ship, rand(1,10), rand(1,10)), "isSunk" => isSunk($board, $ship, rand(1,10), rand(1,10)), "isWin" => isWin()));
+		$hit = array("response" => true, "ack_shot" => array("x" => $x, "y" => $y, "isHit" => isHit($AIboard, $ship, $x, $y), 
+								     "isSunk" => isSunk($AIboard, $ship, $x, $y, true), "isWin" => isWin()), 
+			     			  "shot" => array("x" => $randomX, "y" => $randomY, "isHit" => isHit($board, $ship, $randomX, 
+														     $randomY), 
+								  "isSunk" => isSunk($board, $ship, $randomX, $randomY, false), 
+								  "isWin" => isWin()));
 	
 // 	} else {
 // 		$ship = $hitResponse;
