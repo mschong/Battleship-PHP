@@ -1,5 +1,6 @@
 <?php
 
+$countSunk;
 
 function createBoard($size){
 	$board = array(array());
@@ -60,7 +61,7 @@ function isThereShip($x,$y){
 
 function hitBoard($board, $x, $y){
 	$place = $board[$x][$y];
-
+	
 	if($place->isHit){
 		return 10;
 	}
@@ -76,6 +77,31 @@ function hitBoard($board, $x, $y){
 	
 	return $place->ship;
 }
+
+function isHit($board, $ship, $x, $y){
+	$place = $board[$x][$y];
+	
+	if($place->isHit){
+		return 10;
+	}
+	
+	$place->isHit = true;
+	if($place->ship != null){
+		return true;
+	}
+	return false;
+}
+
+function isSunk($board,$ship,$x,$y){
+	$place = $board[$x][$y];
+	
+	if($place->ship->countHits == $place->ship->size){
+		$countSunk++;
+		return true;
+	}
+	return false;
+}
+
 
 function createShip($x,$y,$size,$direction,$name){
 	$ship = new Ship($name, $x, $y, $direction, $size);
@@ -110,5 +136,7 @@ class Place{
 		$this->ship = $ship;
 	}
 }
+
+
 
 ?>
