@@ -1,19 +1,20 @@
 <?php
 include 'board.php';
-// $pid = $_GET ['pid'];
-// $shot = $_GET ['shot'];
-$pid = "148798815352358b0e5b97fb44";
-$shot = "3,10";
+$pid = $_GET ['pid'];
+$shot = $_GET ['shot'];
+// $pid = "148799627877058b10576bbfd1";
+// $shot = "1,3";
 $coord = explode ( ",", $shot );
 $coord [0] = intval ( $coord [0] );
 $coord [1] = intval ( $coord [1] );
 $gameInfo = fopen ( "../new/$pid", "r+" );
+$AIinfo = fopen ( "../new/$pid.AI", "r+" );
+
 $board = createBoard ( 10 );
+$AIboard = createBoard ( 10 );
 
 $ships = array ();
 $countSunk = 0;
-
-$AIboard = createBoard ( 10 );
 $AIShips = array ();
 
 // Pid not specified
@@ -57,20 +58,23 @@ if ($coord [0] < 1 || $coord [0] > 10 || $coord [1] < 1 || $coord [1] > 10) {
 	exit ( json_encode ( $invalidShot ) );
 }
 
-for($i = 0; $i < 5; $i ++) {
+$i = 0;
+while ( ($line = fgets ( $gameInfo )) != false ) {
 	
-	$line = fgets ( $gameInfo );
 	$explodedLine = explode ( ",", $line );
 	if ($explodedLine [3] == '1')
 		$explodedLine [3] = true;
 	else
 		$explodedLine [3] = false;
 	$ships [$i] = createShip ( $explodedLine [1], $explodedLine [2], $explodedLine [4], $explodedLine [3], $explodedLine [0], $explodedLine [5] );
+	
 	$board = fillBoard ( $board, $ships [$i] );
+	$i ++;
 }
-for($i = 0; $i < 5; $i ++) {
-	$AILine = fgets ( $gameInfo );
+$i = 0;
+while ( ($AILine = fgets ( $AIinfo )) != false ) {
 	$explodedLine = explode ( ",", $AILine );
+	
 	if ($explodedLine [3] == '1')
 		$explodedLine [3] = true;
 	else
@@ -78,21 +82,21 @@ for($i = 0; $i < 5; $i ++) {
 	
 	$AIships [$i] = createShip ( $explodedLine [1], $explodedLine [2], $explodedLine [4], $explodedLine [3], $explodedLine [0], $explodedLine [5] );
 	$AIboard = fillBoard ( $AIboard, $AIships [$i] );
+	$i ++;
 }
-// fwrite($gameInfo, "shupan");
 
 $randomX = rand ( 1, 10 );
 $randomY = rand ( 1, 10 );
 // $randomX = 2;
 // $randomY = 4;
-hit ( $coord [0], $coord [1], $randomX, $randomY, $board, $AIboard, $gameInfo );
+hit ( $coord [0], $coord [1], $randomX, $randomY, $board, $AIboard, $gameInfo, $AIinfo, $pid );
 function isWin() {
 	if ($countSunk == 5) {
 		return true;
 	}
 	return false;
 }
-function hit($x, $y, $randomX, $randomY, $board, $AIboard, $gameInfo) {
+function hit($x, $y, $randomX, $randomY, $board, $AIboard, $gameInfo, $AIinfo, $pid) {
 	$hitResponse = hitBoard ( $AIboard, $x, $y );
 	$hitResponseAI = hitBoard ( $board, $randomX, $randomY );
 	
@@ -105,8 +109,6 @@ function hit($x, $y, $randomX, $randomY, $board, $AIboard, $gameInfo) {
 		);
 		exit ( json_encode ( $invalidShot ) );
 	} else {
-		$fileArray = file ( "../new/148798815352358b0e5b97fb44" );
-		print_r ( $fileArray );
 		
 		$hit = array (
 				"response" => true,
@@ -128,11 +130,43 @@ function hit($x, $y, $randomX, $randomY, $board, $AIboard, $gameInfo) {
 				) 
 		);
 		
-		fwrite ( $gameInfo, "shupan" );
+		if (isHit ( $hitResponse )) {
+			$fileArray = file ( "../new/$pid.AI" );
+			// print_r($fileArray);
+			file_put_contents ( "../new/$pid.AI", "" );
+			for($i = 0; $i < count ( $fileArray ); $i ++) {
+				$expl = explode ( ",", $fileArray [$i] );
+				if ($expl [0] == $hitResponse->name) {
+					$expl [5] = intval ( $expl [5] );
+					$expl [5] = $expl [5] + 1;
+					$expl [5] = "$expl[5]" . PHP_EOL;
+					$fileArray [$i] = implode ( ",", $expl );
+					// print_r($fileArray);
+				}
+				// print_r($fileArray);
+				fwrite ( $AIinfo, $fileArray [$i] );
+			}
+		}
+		if (isHit ( $hitResponseAI )) {
+			$fileArray = file ( "../new/$pid" );
+			// print_r($fileArray);
+			file_put_contents ( "../new/$pid", "" );
+			for($i = 0; $i < count ( $fileArray ); $i ++) {
+				$expl = explode ( ",", $fileArray [$i] );
+				if ($expl [0] == $hitResponse->name) {
+					$expl [5] = intval ( $expl [5] );
+					$expl [5] = $expl [5] + 1;
+					$expl [5] = "$expl[5]" . PHP_EOL;
+					$fileArray [$i] = implode ( ",", $expl );
+					// print_r($fileArray);
+				}
+				// print_r($fileArray);
+				fwrite ( $AIinfo, $fileArray [$i] );
+			}
+		}
 		exit ( json_encode ( $hit ) );
 	}
 }
-// print_r($hit);
 function isAvailable($board, $size, $rx, $ry, $horizontal) {
 	// This method will return false if the cell is already occupied.
 	if (! $horizontal) {

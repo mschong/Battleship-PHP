@@ -1,7 +1,6 @@
 <?php
 // $strategy = $_GET ['strategy'];
 // $ships = $_GET ['ships'];
-
 $strategy = "Smart";
 $ships = "Aircraft carrier,6,8,true;Battleship,4,1,true;Frigate,1,7,true;Submarine,4,10,true;Minesweeper,2,4,true";
 
@@ -142,10 +141,8 @@ $success = array (
 );
 
 $file = fopen ( "$pid", "w" );
+$AIfile = fopen ( "$pid.AI", "w" );
 echo json_encode ( $file );
-
-print_r ( $AIs );
-print_r ( $shipsArray );
 
 
 foreach ( $shipsArray as $s ) {
@@ -154,12 +151,11 @@ foreach ( $shipsArray as $s ) {
 }
 
 foreach ( $AIs as $AIship ) {
-	fwrite ( $file, "$AIship->name,$AIship->x,$AIship->y,$AIship->horizontal,$AIship->size,0" );
-	fwrite ( $file, PHP_EOL );
+	fwrite ( $AIfile, "$AIship->name,$AIship->x,$AIship->y,$AIship->horizontal,$AIship->size,0" );
+	fwrite ( $AIfile, PHP_EOL );
 }
 
 exit ( json_encode ( $success ) );
-
 function prettyPrint($board) {
 	for($i = 1; $i <= 10; $i ++) {
 		for($j = 1; $j <= 10; $j ++)
@@ -167,7 +163,6 @@ function prettyPrint($board) {
 		echo "\n";
 	}
 }
-
 function placeInBoard(&$board, $ship) {
 	if (! isAvailable ( $board, $ship->size, $ship->x, $ship->y, $ship->horizontal )) {
 		return false;
@@ -183,7 +178,6 @@ function placeInBoard(&$board, $ship) {
 	
 	return true;
 }
-
 class Ship { // Ship object. One for every ship, 5 per board per game.
 	public $horizontal; // if false, ship is vertical
 	public $name; // Aircraft carrier, etc.
@@ -200,7 +194,6 @@ class Ship { // Ship object. One for every ship, 5 per board per game.
 		$this->size = $size;
 	}
 }
-
 function randomPlacement($boardSize, &$ships) {
 	$board = createBoard ( $boardSize );
 	
@@ -209,7 +202,6 @@ function randomPlacement($boardSize, &$ships) {
 	
 	return $board;
 }
-
 function createRandShips() {
 	$shipNames = array (
 			
@@ -253,6 +245,8 @@ function placeRandomly(&$board, &$ship) {
 	$randomXcoordinate;
 	$randomYcoordinate;
 	
+	
+	
 	$randomDirection = rand ( 0, 1 );
 	$ship->horizontal = $randomDirection;
 	
@@ -280,7 +274,13 @@ function placeRandomly(&$board, &$ship) {
 	placeInBoard ( $board, $ship );
 }
 function isAvailable($board, $size, $rx, $ry, $horizontal) {
-	
+	if ($horizontal) {
+		if ($rx + $size-1 > 10)
+			return false;
+	} else {
+		if ($ry + $size-1 > 10)
+			return false;
+	}
 	// This method will return false if the cell is already occupied.
 	if (! $horizontal) {
 		
