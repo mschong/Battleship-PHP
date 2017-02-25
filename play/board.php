@@ -1,7 +1,7 @@
 <?php
 
 $countSunk;
-
+$AIcountSunk;
 function createBoard($size){
 	$board = array(array());
 	for ($i = 1; $i <= $size; $i++) {
@@ -73,6 +73,7 @@ function hitBoard($board, $x, $y){
 	if($place->ship != null){
 		$place->ship->countHits = $place->ship->countHits+1;
 		if($place->ship->countHits == $place->ship->size){
+			$countSunk ++;
 			$place->ship->sunk = true;	
 		}
 
@@ -88,12 +89,28 @@ function isHit($ship){
 	return false;
 }
 
+<<<<<<< HEAD
 function isSunk($ship){
 	if($ship == null)
 		return false;
 	if($ship->sunk == null)
 		return false;
 	return $ship->sunk;
+=======
+function isSunk($board,$ship,$x,$y,$player){
+	$place = $board[$x][$y];
+	
+	if($place->ship->countHits == $place->ship->size){
+		if($player == true){
+		$countSunk++;
+		}
+		else{
+		$AIcountSunk++;
+		}
+		return true;
+	}
+	return false;
+>>>>>>> 55a1158ab532a621ee08ed684b681e9ae2246d83
 }
 
 
