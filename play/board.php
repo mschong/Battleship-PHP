@@ -1,124 +1,90 @@
 <?php
-
 $countSunk;
-$AIcountSunk;
-function createBoard($size){
-	$board = array(array());
-	for ($i = 1; $i <= $size; $i++) {
-		for ($j = 1; $j <= $size; $j++) {
-			$board[$i][$j] = new Place(0, null);
+function createBoard($size) {
+	$board = array (
+			array () 
+	);
+	for($i = 1; $i <= $size; $i ++) {
+		for($j = 1; $j <= $size; $j ++) {
+			$board [$i] [$j] = new Place ( 0, null );
 		}
 	}
 	return $board;
 }
-
-function fillBoard($boardToFill, $ship){
-	
-	$intx = intval($ship->x);
-	$inty = intval($ship->y);
-	for ($i = 0; $i < $ship->size; $i++) {
-		if ($ship->horizontal == true){
-			$boardToFill[$intx+$i][$inty]->ship = $ship;
-
-		}
-		else{
-			$boardToFill[$intx][$inty+$i]->ship = $ship;
+function fillBoard($boardToFill, $ship) {
+	$intx = intval ( $ship->x );
+	$inty = intval ( $ship->y );
+	for($i = 0; $i < $ship->size; $i ++) {
+		if ($ship->horizontal == true) {
+			$boardToFill [$intx + $i] [$inty]->ship = $ship;
+		} else {
+			$boardToFill [$intx] [$inty + $i]->ship = $ship;
 		}
 	}
-// 	printBoard($boardToFill);
+	// printBoard($boardToFill);
 	
 	return $boardToFill;
-	
 }
-
-function printBoard($boardToPrint){
+function printBoard($boardToPrint) {
 	echo "printing board\n";
-
-	for ($i = 1;$i<=count($boardToPrint);$i++){
-		for ($j = 1;$j<=count($boardToPrint);$j++){
-			echo $boardToPrint[$i][$j]->ship->name ;
+	
+	for($i = 1; $i <= count ( $boardToPrint ); $i ++) {
+		for($j = 1; $j <= count ( $boardToPrint ); $j ++) {
+			echo $boardToPrint [$i] [$j]->ship->name;
 			echo " ";
 		}
 		echo "\n";
 	}
 }
-function visited($x,$y){
-	
-	if ($board[$x][$y]){
+function visited($x, $y) {
+	if ($board [$x] [$y]) {
 		return true;
-	}
-	else{
-		$board[$x][$y] = 1;
+	} else {
+		$board [$x] [$y] = 1;
 		return false;
 	}
 }
-
-function isThereShip($x,$y){
-	if (is_string($board[$x][$y])){
+function isThereShip($x, $y) {
+	if (is_string ( $board [$x] [$y] )) {
 		return true;
-	}
-	else{
+	} else {
 		return false;
 	}
 }
-
-function hitBoard($board, $x, $y){
-	$place = $board[$x][$y];
+function hitBoard($board, $x, $y) {
+	$place = $board [$x] [$y];
 	
-	if($place->isHit){
+	if ($place->isHit) {
 		return 10;
 	}
 	$place->isHit = true;
 	
-	if($place->ship != null){
-		$place->ship->countHits = $place->ship->countHits+1;
-		if($place->ship->countHits == $place->ship->size){
-			$countSunk ++;
-			$place->ship->sunk = true;	
+	if ($place->ship != null) {
+		$place->ship->countHits = $place->ship->countHits + 1;
+		if ($place->ship->countHits == $place->ship->size) {
+			$place->ship->sunk = true;
 		}
-
 	}
 	
 	return $place->ship;
 }
-
-function isHit($ship){
-	if($ship != null){
+function isHit($ship) {
+	if ($ship != null) {
 		return true;
 	}
 	return false;
 }
-
-<<<<<<< HEAD
-function isSunk($ship){
-	if($ship == null)
+function isSunk($ship) {
+	if ($ship == null)
 		return false;
-	if($ship->sunk == null)
+	if ($ship->sunk == null)
 		return false;
 	return $ship->sunk;
-=======
-function isSunk($board,$ship,$x,$y,$player){
-	$place = $board[$x][$y];
-	
-	if($place->ship->countHits == $place->ship->size){
-		if($player == true){
-		$countSunk++;
-		}
-		else{
-		$AIcountSunk++;
-		}
-		return true;
-	}
-	return false;
->>>>>>> 55a1158ab532a621ee08ed684b681e9ae2246d83
 }
-
-
-function createShip($x,$y,$size,$direction,$name, $hits){
-	$ship = new Ship($name, $x, $y, $direction, $size, $hits);
+function createShip($x, $y, $size, $direction, $name, $hits) {
+	$ship = new Ship ( $name, $x, $y, $direction, $size, $hits );
 	return $ship;
 }
-
 class Ship { // Ship object. One for every ship, 5 per board per game.
 	public $horizontal; // if false, ship is vertical
 	public $name; // Aircraft carrier, etc.
@@ -137,17 +103,13 @@ class Ship { // Ship object. One for every ship, 5 per board per game.
 		$this->countHits = $hits;
 	}
 }
-
-class Place{
+class Place {
 	public $isHit;
 	public $ship;
-	
-	public function __construct($isHit, $ship){
+	public function __construct($isHit, $ship) {
 		$this->isHit = $isHit;
 		$this->ship = $ship;
 	}
 }
-
-
 
 ?>
