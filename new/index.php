@@ -1,8 +1,14 @@
 <?php
-$strategy = $_GET ['strategy'];
-$ships = $_GET ['ships'];
+// $strategy = $_GET ['strategy'];
+// $ships = $_GET ['ships'];
+
+$strategy = "Smart";
+$ships = "Aircraft carrier,6,8,true;Battleship,4,1,true;Frigate,1,7,true;Submarine,4,10,true;Minesweeper,2,4,true";
 
 $board = createBoard ( 10 );
+
+$AIs = createRandShips ();
+$AIboard = randomPlacement ( 10, $AIs );
 
 // Check if ship info is provided
 if ($ships == null) {
@@ -91,8 +97,6 @@ for($i = 0; $i < count ( $ship ); $i ++) {
 	}
 }
 
-
-
 // Place ships in board
 // Error: Conflicting ship deployments
 $shipsArray = array ();
@@ -114,7 +118,7 @@ foreach ( $ship as $individualShip ) {
 if (count ( $ship ) != 5) {
 	$incompleteShips = array (
 			"response" => false,
-			"reason" => "Incomplete ship deployments"
+			"reason" => "Incomplete ship deployments" 
 	);
 	exit ( json_encode ( $incompleteShips ) );
 }
@@ -124,29 +128,38 @@ for($i = 0; $i < count ( $ship ); $i ++) {
 		if ($shipsArray [$i]->name == $shipsArray [$j]->name) {
 			$incompleteShips = array (
 					"response" => false,
-					"reason" => "Incomplete ship deployments"
+					"reason" => "Incomplete ship deployments" 
 			);
 			exit ( json_encode ( $incompleteShips ) );
 		}
 	}
 }
 
-$pid = uniqid(round(microtime(true)*1000));
+$pid = uniqid ( round ( microtime ( true ) * 1000 ) );
 $success = array (
 		"response" => true,
 		"pid" => $pid 
 );
 
-$file = fopen("$pid", "w");
-echo json_encode($file);
-foreach($shipsArray as $s){
-	fwrite($file, "$s->name, $s->x, $s->y, $s->horizontal, $s->size" );
-	fwrite($file, PHP_EOL);
+$file = fopen ( "$pid", "w" );
+echo json_encode ( $file );
+
+print_r ( $AIs );
+print_r ( $shipsArray );
+
+
+foreach ( $shipsArray as $s ) {
+	fwrite ( $file, "$s->name,$s->x,$s->y,$s->horizontal,$s->size,0" );
+	fwrite ( $file, PHP_EOL );
 }
-	
-	
-	
+
+foreach ( $AIs as $AIship ) {
+	fwrite ( $file, "$AIship->name,$AIship->x,$AIship->y,$AIship->horizontal,$AIship->size,0" );
+	fwrite ( $file, PHP_EOL );
+}
+
 exit ( json_encode ( $success ) );
+
 function prettyPrint($board) {
 	for($i = 1; $i <= 10; $i ++) {
 		for($j = 1; $j <= 10; $j ++)
@@ -154,6 +167,7 @@ function prettyPrint($board) {
 		echo "\n";
 	}
 }
+
 function placeInBoard(&$board, $ship) {
 	if (! isAvailable ( $board, $ship->size, $ship->x, $ship->y, $ship->horizontal )) {
 		return false;
@@ -169,6 +183,7 @@ function placeInBoard(&$board, $ship) {
 	
 	return true;
 }
+
 class Ship { // Ship object. One for every ship, 5 per board per game.
 	public $horizontal; // if false, ship is vertical
 	public $name; // Aircraft carrier, etc.
@@ -185,6 +200,7 @@ class Ship { // Ship object. One for every ship, 5 per board per game.
 		$this->size = $size;
 	}
 }
+
 function randomPlacement($boardSize, &$ships) {
 	$board = createBoard ( $boardSize );
 	
@@ -193,6 +209,7 @@ function randomPlacement($boardSize, &$ships) {
 	
 	return $board;
 }
+
 function createRandShips() {
 	$shipNames = array (
 			
@@ -210,6 +227,7 @@ function createRandShips() {
 			3,
 			2 
 	);
+	
 	$ships = array ();
 	
 	for($i = 0; $i <= 4; $i ++) {

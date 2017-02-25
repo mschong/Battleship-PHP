@@ -25,7 +25,10 @@ function fillBoard($boardToFill, $ship){
 			$boardToFill[$intx][$inty+$i]->ship = $ship;
 		}
 	}
+// 	printBoard($boardToFill);
+	
 	return $boardToFill;
+	
 }
 
 function printBoard($boardToPrint){
@@ -33,7 +36,7 @@ function printBoard($boardToPrint){
 
 	for ($i = 1;$i<=count($boardToPrint);$i++){
 		for ($j = 1;$j<=count($boardToPrint);$j++){
-			print_r($boardToPrint[$i][$j]) ;
+			echo $boardToPrint[$i][$j]->ship->name ;
 			echo " ";
 		}
 		echo "\n";
@@ -65,10 +68,10 @@ function hitBoard($board, $x, $y){
 	if($place->isHit){
 		return 10;
 	}
-	
 	$place->isHit = true;
+	
 	if($place->ship != null){
-		$place->ship->countHits++;
+		$place->ship->countHits = $place->ship->countHits+1;
 		if($place->ship->countHits == $place->ship->size){
 			$place->ship->sunk = true;	
 		}
@@ -78,33 +81,24 @@ function hitBoard($board, $x, $y){
 	return $place->ship;
 }
 
-function isHit($board, $ship, $x, $y){
-	$place = $board[$x][$y];
-	
-	if($place->isHit){
-		return 10;
-	}
-	
-	$place->isHit = true;
-	if($place->ship != null){
+function isHit($ship){
+	if($ship != null){
 		return true;
 	}
 	return false;
 }
 
-function isSunk($board,$ship,$x,$y){
-	$place = $board[$x][$y];
-	
-	if($place->ship->countHits == $place->ship->size){
-		$countSunk++;
-		return true;
-	}
-	return false;
+function isSunk($ship){
+	if($ship == null)
+		return false;
+	if($ship->sunk == null)
+		return false;
+	return $ship->sunk;
 }
 
 
-function createShip($x,$y,$size,$direction,$name){
-	$ship = new Ship($name, $x, $y, $direction, $size);
+function createShip($x,$y,$size,$direction,$name, $hits){
+	$ship = new Ship($name, $x, $y, $direction, $size, $hits);
 	return $ship;
 }
 
@@ -116,14 +110,14 @@ class Ship { // Ship object. One for every ship, 5 per board per game.
 	public $sunk; // if false, ship is alive :D
 	public $size;
 	public $countHits;
-	public function __construct($name, $x, $y, $horizontal, $size) {
+	public function __construct($name, $x, $y, $horizontal, $size, $hits) {
 		$this->name = $name;
 		$this->x = $x;
 		$this->y = $y;
 		$this->horizontal = $horizontal;
 		$sunk = 0;
 		$this->size = $size;
-		$this->countHits = 0;
+		$this->countHits = $hits;
 	}
 }
 
