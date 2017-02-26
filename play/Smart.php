@@ -14,36 +14,15 @@ $range = array ();
 $xcor = array ();
 $ycor = array ();
 
-
-
-$prevHitBool [0] = true;
-$prevHitBool [1] = true;
-$prevShotXcoord = 5;
-$prevShotYcoord = 6;
-$shotsTaken [0] = "45";
-$shotsTaken [1] = "89";
-$lastHit [0] = 9;
-$lastHit [1] = 2;
-$shotCount = 23;
-$directionCount = 3;
-$boardSize = 10;
-
-
-
-read ();
-randomCoordinates ();
-write ();
-
-
 function randomCoordinates($pid) {
 	
-	read($pid);
+
 	
 	global $xcor;
 	global $ycor;
 	
 	//If the file does not exist, it generate two arrays that will be used to create random coordinates
-	if (!file_exists ( "../play/"."$pid"."S.txt" )) {
+	if (!file_exists ( "../new/"."$pid"."S.txt" )) {
 		
 		for($i = 1; $i <= 10; $i ++)
 			for($j = 1; $j <= 10; $j ++) {
@@ -53,9 +32,10 @@ function randomCoordinates($pid) {
 		
 		shuffle($xcor);
 		shuffle($ycor);
+		write($pid);
 	}
 	
-	
+	read($pid);
 	global $shotsTaken;
 	
 	createRandom:
@@ -105,7 +85,7 @@ function write($pid) {
 			$ycor
 	);
 	
-	$gameInfoSmart = fopen ( "../play/"."$pid"."S.txt", "w+" );
+	$gameInfoSmart = fopen ( "../new/"."$pid"."S.txt", "w+" );
 	fwrite ( $gameInfoSmart, json_encode ( $writeToFile ) );
 }
 function read($pid) {
@@ -124,7 +104,7 @@ function read($pid) {
 	global $xcor;
 	global $ycor;
 	
-	$myfile = fopen ( "../play/"."$pid"."S.txt", "r" ) or die ( "Unable to open file!" );
+	$myfile = fopen ( "../new/"."$pid"."S.txt", "r" ) or die ( "Unable to open file!" );
 	$gameInfoSmart = fgets ( $myfile );
 	$variables = json_decode ( $gameInfoSmart, true );
 	
@@ -140,7 +120,7 @@ function read($pid) {
 	$xcor = $variables[8];
 	$ycor = $variables[9];
 	
-	echo $shotsTaken [0];
+	
 }
 function smart($pid) {
 	
@@ -154,7 +134,7 @@ function smart($pid) {
 	 *
 	 */
 	
-	if (file_exists ( "../play/"."$pid"."S.txt" ))
+	if (file_exists ( "../new/"."$pid"."S.txt" ))
 		read($pid);
 	
 	

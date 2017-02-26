@@ -90,6 +90,7 @@ $AiX;
 $AiY;
 // $randomX = 2;
 // $randomY = 4;
+$strategy = "Smart";
 
 $shot;
 if ($strategy == "Smart") {
@@ -102,7 +103,7 @@ else if($strategy == "Random"){
 	$AiX = $shot [0];
 	$AiY = $shot [1];
 }
-hit ( $coord [0], $coord [1], $randomX, $randomY, $board, $AIboard, $gameInfo, $AIinfo, $pid );
+hit ( $coord [0], $coord [1], $AiX, $AiY, $board, $AIboard, $gameInfo, $AIinfo, $pid );
 function isWin() {
 	if ($countSunk == 5) {
 		return true;
