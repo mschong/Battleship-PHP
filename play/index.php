@@ -1,5 +1,6 @@
 <?php
 include 'board.php';
+include 'Smart.php';
 $pid = $_GET ['pid'];
 $shot = $_GET ['shot'];
 // $pid = "148799627877058b10576bbfd1";
@@ -14,7 +15,7 @@ $board = createBoard ( 10 );
 $AIboard = createBoard ( 10 );
 
 $ships = array ();
-$countSunk = 0;
+$countSunk = 0; // asi nunca va a ganar nadie
 $AIShips = array ();
 
 // Pid not specified
@@ -85,10 +86,22 @@ while ( ($AILine = fgets ( $AIinfo )) != false ) {
 	$i ++;
 }
 
-$randomX = rand ( 1, 10 );
-$randomY = rand ( 1, 10 );
+$AiX;
+$AiY;
 // $randomX = 2;
 // $randomY = 4;
+
+$shot;
+if ($strategy == "Smart") {
+	$shot = smart ($pid);
+	$AiX = $shot [0];
+	$AiY = $shot [1];
+}
+else if($strategy == "Random"){
+	$shot = randomCoordinates($pid);
+	$AiX = $shot [0];
+	$AiY = $shot [1];
+}
 hit ( $coord [0], $coord [1], $randomX, $randomY, $board, $AIboard, $gameInfo, $AIinfo, $pid );
 function isWin() {
 	if ($countSunk == 5) {
@@ -96,11 +109,46 @@ function isWin() {
 	}
 	return false;
 }
-function hit($x, $y, $randomX, $randomY, $board, $AIboard, $gameInfo, $AIinfo, $pid) {
+function hit($x, $y, $aiX, $aiY, $board, $AIboard, $gameInfo, $AIinfo, $pid) {
 	$hitResponse = hitBoard ( $AIboard, $x, $y );
-	$hitResponseAI = hitBoard ( $board, $randomX, $randomY );
+	$hitResponseAI = hitBoard ( $board, $aiX, $aiY );
 	
 	$hit;
+	global $strategy;
+	
+	if ($strategy == "Smart") {
+		global $prevHitBool;
+		global $prevShotXcoord;
+		global $prevShotYcoord;
+		global $lastHit;
+		
+		if (isHit ( $hitResponseAI )) {
+			
+//If the last shot made by the computer hit, set $prevHitBool[0] and $prevHitBool[1] = true
+//If the last shot made by the computer hit, set $lastHit[0] = the X coordinate, and set $lastHit[1] = the Y coordinate
+			
+			
+			$prevHitBool [0] = true;
+			$prevHitBool [1] = true;
+			$lastHit [0] = $aiX;
+			$lastHit [1] = $aiY;
+		} else {
+			$prevHitBool [0] = false;
+			//If the last shot made by the computer did not hit, set $prevHitBool[0] = false
+		}
+		
+		if (isSunk ( $hitResponseAI )) {
+			//If the last shot sunk a ship, set $prevHitBool[0] and $prevHitBool[1] = false
+			$prevHitBool [0] = false;
+			$prevHitBool [1] = false;
+		}
+		
+		//Each time a shot is made, set $prevX and $prevY = x and y, respectively
+		$prevShotXcoord = $aiX;
+		$prevShotYcoord = $aiY;
+		
+		write ($pid);
+	}
 	
 	if ($hitResponse == 10) {
 		$invalidShot = array (
@@ -121,8 +169,8 @@ function hit($x, $y, $randomX, $randomY, $board, $AIboard, $gameInfo, $AIinfo, $
 						"ship" => sunkenShipCoordinates ( $hitResponse ) 
 				),
 				"shot" => array (
-						"x" => $randomX,
-						"y" => $randomY,
+						"x" => $aiX,
+						"y" => $aiY,
 						"isHit" => isHit ( $hitResponseAI ),
 						"isSunk" => isSunk ( $hitResponseAI ),
 						"isWin" => isWin (),
