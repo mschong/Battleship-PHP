@@ -1,5 +1,5 @@
 <?php
-//Variables for smart Strategy
+// Variables for smart Strategy
 $prevHitBool = array ();
 $prevShotXcoord;
 $prevShotYcoord;
@@ -8,21 +8,15 @@ $lastHit = array ();
 $shotCount = 0;
 $directionCount;
 $boardSize;
-
 $range = array ();
-
 $xcor = array ();
 $ycor = array ();
-
 function randomCoordinates($pid) {
-	
-
-	
 	global $xcor;
 	global $ycor;
 	
-	//If the file does not exist, it generate two arrays that will be used to create random coordinates
-	if (!file_exists ( "../new/"."$pid"."S.txt" )) {
+	// If the file does not exist, it generate two arrays that will be used to create random coordinates
+	if (! file_exists ( "../new/" . "$pid" . "S.txt" )) {
 		
 		for($i = 1; $i <= 10; $i ++)
 			for($j = 1; $j <= 10; $j ++) {
@@ -30,34 +24,39 @@ function randomCoordinates($pid) {
 				array_push ( $ycor, $j );
 			}
 		
-		shuffle($xcor);
-		shuffle($ycor);
-		write($pid);
+		shuffle ( $xcor );
+		shuffle ( $ycor );
+		write ( $pid );
 	}
 	
-	read($pid);
+	read ( $pid );
 	global $shotsTaken;
 	
 	createRandom:
 	
-		shuffle($xcor);
-		shuffle($ycor);
-		$x = array_pop($xcor);
-		$y = array_pop($ycor);
-		
-		$shot = array($x,$y);
-		$xy = "$x$y";
-		//echo $xy;
-		
-		if(in_array($xy,$shotsTaken))
-			goto createRandom;
-		else{ 
-			array_push($shotsTaken,$xy);
-			write($pid);
-			return $shot;
-		}
+	shuffle ( $xcor );
+	shuffle ( $ycor );
+	$x = array_pop ( $xcor );
+	$y = array_pop ( $ycor );
+	
+	$shot = array (
+			$x,
+			$y 
+	);
+	$xy = "$x$y";
+	// echo $xy;
+	
+	if (in_array ( $xy, $shotsTaken )){
+		array_push($xcor, $x);
+		array_push($ycor, $y);
+		goto createRandom;
+	}
+	else {
+		array_push ( $shotsTaken, $xy );
+		write ( $pid );
+		return $shot;
+	}
 }
-
 function write($pid) {
 	global $prevHitBool;
 	global $prevShotXcoord;
@@ -80,12 +79,12 @@ function write($pid) {
 			$lastHit,
 			$shotCount,
 			$directionCount,
-			$boardSize, 
+			$boardSize,
 			$xcor,
-			$ycor
+			$ycor 
 	);
 	
-	$gameInfoSmart = fopen ( "../new/"."$pid"."S.txt", "w+" );
+	$gameInfoSmart = fopen ( "../new/" . "$pid" . "S.txt", "w+" );
 	fwrite ( $gameInfoSmart, json_encode ( $writeToFile ) );
 }
 function read($pid) {
@@ -104,7 +103,7 @@ function read($pid) {
 	global $xcor;
 	global $ycor;
 	
-	$myfile = fopen ( "../new/"."$pid"."S.txt", "r" ) or die ( "Unable to open file!" );
+	$myfile = fopen ( "../new/" . "$pid" . "S.txt", "r" ) or die ( "Unable to open file!" );
 	$gameInfoSmart = fgets ( $myfile );
 	$variables = json_decode ( $gameInfoSmart, true );
 	
@@ -117,10 +116,8 @@ function read($pid) {
 	$directionCount = $variables [6];
 	$boardSize = $variables [7];
 	
-	$xcor = $variables[8];
-	$ycor = $variables[9];
-	
-	
+	$xcor = $variables [8];
+	$ycor = $variables [9];
 }
 function smart($pid) {
 	
@@ -133,10 +130,8 @@ function smart($pid) {
 	 * Each time a shot is made, set $prevX and $prevY = x and y, respectively
 	 *
 	 */
-	
-	if (file_exists ( "../new/"."$pid"."S.txt" ))
-		read($pid);
-	
+	if (file_exists ( "../new/" . "$pid" . "S.txt" ))
+		read ( $pid );
 	
 	global $prevHitBool;
 	global $shotsTaken;
@@ -145,6 +140,8 @@ function smart($pid) {
 	global $directionCount;
 	global $boardSize;
 	global $lastHit;
+	
+	$boardSize = 10;
 	
 	$shot = array ();
 	
@@ -157,6 +154,9 @@ function smart($pid) {
 		
 		pickShot:
 		
+		if ($directionCount == 4)
+			goto newShot;
+		
 		if ($directionCount == 0) { // The next shot will be to the right, unless invalid
 			
 			$shot [0] = $prevShotXcoord + 1;
@@ -166,10 +166,8 @@ function smart($pid) {
 			if ($prevShotXcoord == $boardSize || in_array ( $seek, $shotsTaken )) {
 				$directionCount = 1;
 				goto pickShot;
-			} 
-
-			else {
-				array_push($shotsTaken,$seek);
+			} else {
+				array_push ( $shotsTaken, $seek );
 				$shotCount ++;
 				return $shot;
 			}
@@ -183,10 +181,8 @@ function smart($pid) {
 			if ($prevShotXcoord == 1 || in_array ( $seek, $shotsTaken )) {
 				$directionCount = 2;
 				goto pickShot;
-			} 
-
-			else {
-				array_push($shotsTaken,$seek);
+			} else {
+				array_push ( $shotsTaken, $seek );
 				$shotCount ++;
 				return $shot;
 			}
@@ -194,16 +190,14 @@ function smart($pid) {
 		if ($directionCount == 2) { // The next shot will be upwards, unless invalid
 			
 			$shot [0] = $prevShotXcoord;
-			$shot [1] = $prevShotYcoord + 1;
+			$shot [1] = $prevShotYcoord - 1;
 			$seek = "$shot[0]" . "$shot[1]";
 			
-			if ($prevShotXcoord == 1 || in_array ( $seek, $shotsTaken )) {
+			if ($prevShotYcoord == 1 || in_array ( $seek, $shotsTaken )) {
 				$directionCount = 3;
 				goto pickShot;
-			} 
-
-			else {
-				array_push($shotsTaken,$seek);
+			} else {
+				array_push ( $shotsTaken, $seek );
 				$shotCount ++;
 				return $shot;
 			}
@@ -212,31 +206,26 @@ function smart($pid) {
 		if ($directionCount == 3) { // The next shot will be downwards, unless invalid
 			
 			$shot [0] = $prevShotXcoord;
-			$shot [1] = $prevShotYcoord - 1;
+			$shot [1] = $prevShotYcoord + 1;
 			$seek = "$shot[0]" . "$shot[1]";
 			
-			if ($prevShotXcoord == 1 || in_array ( $seek, $shotsTaken )) {
+			if ($prevShotYcoord == 10 || in_array ( $seek, $shotsTaken )) {
 				$directionCount = 4;
 				goto pickShot;
-			} 
-
-			else {
-				array_push($shotsTaken,$seek);
+			} else {
+				array_push ( $shotsTaken, $seek );
 				$shotCount ++;
 				return $shot;
 			}
 		}
 	} else {
-		
+		newShot:
 		$directionCount = 0;
-		$shot = randomCoordinates();
+		$shot = randomCoordinates ( $pid );
 		$seek = "$shot[0]" . "$shot[1]";
 		
-		write($pid);
+		write ( $pid );
 		return $shot;
-		}
-	
-	
+	}
 }
-
 ?>
