@@ -12,7 +12,7 @@ function createBoard($size) {
 	return $board;
 }
 function fillBoard($boardToFill, $ship) {
-	$intx = intval ( $ship->x );
+	$intx = intval ( $ship->x );//Flipped
 	$inty = intval ( $ship->y );
 	for($i = 0; $i < $ship->size; $i ++) {
 		if ($ship->horizontal == true) {
