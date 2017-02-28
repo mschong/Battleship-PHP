@@ -1,8 +1,8 @@
 <?php
-// $strategy = $_GET ['strategy'];
-// $ships = $_GET ['ships'];
-$strategy = "Smart";
-$ships = "Aircraft carrier,6,8,true;Battleship,4,1,true;Frigate,1,7,true;Submarine,4,10,true;Minesweeper,2,4,true";
+ $strategy = $_GET ['strategy'];
+ $ships = $_GET ['ships'];
+//$strategy = "Smart";
+//$ships = "Aircraft carrier,1,1,true;Battleship,2,2,false;Frigate,5,7,true;Submarine,1,10,true;Minesweeper,10,1,false";
 
 $board = createBoard ( 10 );
 
