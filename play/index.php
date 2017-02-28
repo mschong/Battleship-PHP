@@ -1,23 +1,20 @@
 <?php
 include 'board.php';
 include 'Smart.php';
-$pid = $_GET ['pid'];
-$shot = $_GET ['shot'];
-// $pid = "148799627877058b10576bbfd1";
-// $shot = "1,3";
+// $pid = $_GET ['pid'];
+// $shot = $_GET ['shot'];
+$pid = "148825330647458b4f17a73acf";
+$shot = "4,7";
 $coord = explode ( ",", $shot );
 $coord [0] = intval ( $coord [0] );
 $coord [1] = intval ( $coord [1] );
 $gameInfo = fopen ( "../new/$pid", "r+" );
 $AIinfo = fopen ( "../new/$pid.AI", "r+" );
-
 $board = createBoard ( 10 );
 $AIboard = createBoard ( 10 );
-
 $ships = array ();
 $countSunk = 0; // asi nunca va a ganar nadie
 $AIShips = array ();
-
 // Pid not specified
 if ($pid == null) {
 	$noPid = array (
@@ -58,7 +55,6 @@ if ($coord [0] < 1 || $coord [0] > 10 || $coord [1] < 1 || $coord [1] > 10) {
 	);
 	exit ( json_encode ( $invalidShot ) );
 }
-
 $i = 0;
 while ( ($line = fgets ( $gameInfo )) != false ) {
 	
@@ -85,24 +81,21 @@ while ( ($AILine = fgets ( $AIinfo )) != false ) {
 	$AIboard = fillBoard ( $AIboard, $AIships [$i] );
 	$i ++;
 }
-
-$AiX;
-$AiY;
+$AiX = 10;
+$AiY = 2;
 // $randomX = 2;
 // $randomY = 4;
 $strategy = "Smart";
-
 $shot;
-if ($strategy == "Smart") {
-	$shot = smart ($pid);
-	$AiX = $shot [0];
-	$AiY = $shot [1];
-}
-else if($strategy == "Random"){
-	$shot = randomCoordinates($pid);
-	$AiX = $shot [0];
-	$AiY = $shot [1];
-}
+// if ($strategy == "Smart") {
+// 	$shot = smart ( $pid );
+// 	$AiX = $shot [0];
+// 	$AiY = $shot [1];
+// } else if ($strategy == "Random") {
+// 	$shot = randomCoordinates ( $pid );
+// 	$AiX = $shot [0];
+// 	$AiY = $shot [1];
+// }
 hit ( $coord [0], $coord [1], $AiX, $AiY, $board, $AIboard, $gameInfo, $AIinfo, $pid );
 function isWin() {
 	if ($countSunk == 5) {
@@ -125,9 +118,8 @@ function hit($x, $y, $aiX, $aiY, $board, $AIboard, $gameInfo, $AIinfo, $pid) {
 		
 		if (isHit ( $hitResponseAI )) {
 			
-//If the last shot made by the computer hit, set $prevHitBool[0] and $prevHitBool[1] = true
-//If the last shot made by the computer hit, set $lastHit[0] = the X coordinate, and set $lastHit[1] = the Y coordinate
-			
+			// If the last shot made by the computer hit, set $prevHitBool[0] and $prevHitBool[1] = true
+			// If the last shot made by the computer hit, set $lastHit[0] = the X coordinate, and set $lastHit[1] = the Y coordinate
 			
 			$prevHitBool [0] = true;
 			$prevHitBool [1] = true;
@@ -135,20 +127,20 @@ function hit($x, $y, $aiX, $aiY, $board, $AIboard, $gameInfo, $AIinfo, $pid) {
 			$lastHit [1] = $aiY;
 		} else {
 			$prevHitBool [0] = false;
-			//If the last shot made by the computer did not hit, set $prevHitBool[0] = false
+			// If the last shot made by the computer did not hit, set $prevHitBool[0] = false
 		}
 		
 		if (isSunk ( $hitResponseAI )) {
-			//If the last shot sunk a ship, set $prevHitBool[0] and $prevHitBool[1] = false
+			// If the last shot sunk a ship, set $prevHitBool[0] and $prevHitBool[1] = false
 			$prevHitBool [0] = false;
 			$prevHitBool [1] = false;
 		}
 		
-		//Each time a shot is made, set $prevX and $prevY = x and y, respectively
+		// Each time a shot is made, set $prevX and $prevY = x and y, respectively
 		$prevShotXcoord = $aiX;
 		$prevShotYcoord = $aiY;
 		
-		write ($pid);
+		write ( $pid );
 	}
 	
 	if ($hitResponse == 10) {
@@ -202,40 +194,23 @@ function hit($x, $y, $aiX, $aiY, $board, $AIboard, $gameInfo, $AIinfo, $pid) {
 			file_put_contents ( "../new/$pid", "" );
 			for($i = 0; $i < count ( $fileArray ); $i ++) {
 				$expl = explode ( ",", $fileArray [$i] );
-				if ($expl [0] == $hitResponse->name) {
+// 				print_r($expl);
+				if ($expl [0] == $hitResponseAI->name) {
 					$expl [5] = intval ( $expl [5] );
 					$expl [5] = $expl [5] + 1;
 					$expl [5] = "$expl[5]" . PHP_EOL;
 					$fileArray [$i] = implode ( ",", $expl );
 					// print_r($fileArray);
 				}
+// 				print_r($expl);
 				// print_r($fileArray);
-				fwrite ( $AIinfo, $fileArray [$i] );
+				fwrite ( $gameInfo, $fileArray [$i] );
 			}
 		}
 		exit ( json_encode ( $hit ) );
 	}
 }
-function isAvailable($board, $size, $rx, $ry, $horizontal) {
-	// This method will return false if the cell is already occupied.
-	if (! $horizontal) {
-		for($i = 0; $i < $size; $i ++) {
-			if ($ry + $i >= count ( $board )) // board variable incomplete
-				return false;
-			if ($board [$rx] [$ry + $i]->ship != null)
-				return false;
-		}
-		return true;
-	} else {
-		for($i = 0; $i < $size; $i ++) {
-			if ($rx + $i >= count ( $board ))
-				return false;
-			if ($board [$rx + $i] [$ry]->ship != null)
-				return false;
-		}
-		return true;
-	}
-}
+
 function sunkenShipCoordinates($ship) {
 	$coordinates = array ();
 	if ($ship->sunk) {
@@ -245,7 +220,7 @@ function sunkenShipCoordinates($ship) {
 		$coorY = $ship->y;
 		$coorY = intval ( $coorY );
 		
-		if ($ship->direction) {
+		if ($ship->horizontal) {
 			$j = 0;
 			for($i = 0; $i < 2 * ($ship->size); $i = $i + 2) {
 				$coordinates [$i] = $coorX + $j;
@@ -264,6 +239,4 @@ function sunkenShipCoordinates($ship) {
 	// print_r($coordinates);
 	return $coordinates;
 }
-
-// exit ( json_encode ( $hit ) );
 ?>
