@@ -81,21 +81,21 @@ while ( ($AILine = fgets ( $AIinfo )) != false ) {
 	$AIboard = fillBoard ( $AIboard, $AIships [$i] );
 	$i ++;
 }
-$AiX = 10;
-$AiY = 2;
+AiX;
+$AiY;
 // $randomX = 2;
 // $randomY = 4;
 $strategy = "Smart";
 $shot;
-// if ($strategy == "Smart") {
-// 	$shot = smart ( $pid );
-// 	$AiX = $shot [0];
-// 	$AiY = $shot [1];
-// } else if ($strategy == "Random") {
-// 	$shot = randomCoordinates ( $pid );
-// 	$AiX = $shot [0];
-// 	$AiY = $shot [1];
-// }
+if ($strategy == "Smart") {
+ 	$shot = smart ( $pid );
+ 	$AiX = $shot [0];
+ 	$AiY = $shot [1];
+ } else if ($strategy == "Random") {
+ 	$shot = randomCoordinates ( $pid );
+ 	$AiX = $shot [0];
+ 	$AiY = $shot [1];
+ }
 hit ( $coord [0], $coord [1], $AiX, $AiY, $board, $AIboard, $gameInfo, $AIinfo, $pid );
 function isWin() {
 	if ($countSunk == 5) {
